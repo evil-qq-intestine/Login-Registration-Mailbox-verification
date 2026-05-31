@@ -1,0 +1,13 @@
+# 忽略 SQLite 数据库文件
+*.db
+
+# 忽略上传的文件目录
+uploads/
+
+# 忽略 IDE 文件
+.idea/
+*.iml
+.DS_Store
+
+# 忽略 Maven 的 target 目录
+target/
