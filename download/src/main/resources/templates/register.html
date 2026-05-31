@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+</head>
+<body>
+<h2>注册账号</h2>
+<form method="post" th:action="@{/register}" th:object="${user}">
+    <div>
+        <label>用户名：</label>
+        <input type="text" th:field="*{userName}" required />
+    </div>
+    <div>
+        <label>密码：</label>
+        <input type="password" th:field="*{password}" required />
+    </div>
+    <div>
+        <label>邮箱：</label>
+        <input type="email" th:field="*{email}" id="email" required />
+    </div>
+    <div>
+        <label>验证码：</label>
+        <input type="text" name="verificationCode" required />
+        <button type="button" id="sendCodeBtn">获取验证码</button>
+    </div>
+    <div th:if="${error}" th:text="${error}" style="color:red;"></div>
+    <div>
+        <button type="submit">注册</button>
+    </div>
+</form>
+<p><a href="/login">已有账号？去登录</a></p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var countdown = 60; // 倒计时秒数
+    var timer = null;
+    var $btn = $("#sendCodeBtn");
+
+    $("#sendCodeBtn").click(function() {
+        var email = $("#email").val();
+        if (!email) {
+            alert("请先填写邮箱");
+            return;
+        }
+        // 禁用按钮，开始倒计时
+        $btn.prop("disabled", true);
+        $btn.text("发送中...");
+
+        $.post("/sendCode", {email: email}, function(data) {
+            alert(data.message);
+            if (data.success) {
+                // 发送成功，开始60秒倒计时
+                startCountdown();
+            } else {
+                // 发送失败，恢复按钮
+                $btn.prop("disabled", false);
+                $btn.text("获取验证码");
+            }
+        }).fail(function() {
+            alert("发送失败，请稍后重试");
+            $btn.prop("disabled", false);
+            $btn.text("获取验证码");
+        });
+    });
+
+    function startCountdown() {
+        var remaining = countdown;
+        $btn.text(remaining + "秒后重试");
+        timer = setInterval(function() {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(timer);
+                $btn.prop("disabled", false);
+                $btn.text("获取验证码");
+            } else {
+                $btn.text(remaining + "秒后重试");
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>
